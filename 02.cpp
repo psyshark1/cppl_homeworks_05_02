@@ -4,22 +4,39 @@ template<typename T>
 class mtable
 {
 public:
-	mtable(T _r, T _c);
+	mtable(int _r, int _c);
 	~mtable();
-	T* operator[](T r);
-	const T* operator[](T r) const;
+	mtable(const mtable&) = delete;
+	mtable& operator=(const mtable&) = delete;
+	//class row_proxy;
+	//row_proxy operator[](int r);
+
+	//class row_proxy
+	//{
+	//public:
+	//	row_proxy() {};
+	//	~row_proxy() {};
+	//	T& operator[](int c);
+
+	//	int& row = mtable<T>::row;
+	//	int& column = mtable<T>::column;
+	//	T**& t_table = mtable<T>::t_table;
+	//};
+
+	T* operator[](int r);
+	const T* operator[](int r) const;
 	int size();
 
 private:
-	T row;
-	T column;
+	int row;
+	int column;
 	T** t_table;
 	T** create_table();
 	void delete_table();
 };
 
 template<typename T>
-mtable<T>::mtable(T _r, T _c) : row(_r), column(_c)
+mtable<T>::mtable(int _r, int _c) : row(_r), column(_c)
 {
 	this->t_table = create_table();
 }
@@ -35,19 +52,34 @@ T** mtable<T>::create_table()
 	return tmp;
 }
 
+//template<typename T>
+//mtable<T>::row_proxy mtable<T>::operator[](int r)
+//{
+//	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
+//	return mtable<T>::row_proxy;
+//}
+//
+//template<typename T>
+//T& mtable<T>::row_proxy::operator[](int c)
+//{
+//	if (c < 0 || c >= this->column) throw std::exception("Column index out of array!");
+//	return this->column;
+//}
+
 template<typename T>
-T* mtable<T>::operator[](T r)
+T* mtable<T>::operator[](int r)
 {
-	if (r < 0 || r > this->row) throw std::exception("Row index out of array!");
+	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
 	return this->t_table[r];
 }
 
 template<typename T>
-const T* mtable<T>::operator[](T r) const
+const T* mtable<T>::operator[](int r) const
 {
-	if (r < 0 || r > this->row) throw std::exception("Row index out of array!");
+	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
 	return this->t_table[r];
 }
+
 
 template<typename T>
 int mtable<T>::size()
