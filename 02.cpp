@@ -5,26 +5,25 @@ class mtable
 {
 public:
 	mtable(int _r, int _c);
+	mtable(const mtable<T>&) = delete;
 	~mtable();
-	mtable(const mtable&) = delete;
-	mtable& operator=(const mtable&) = delete;
-	//class row_proxy;
+	mtable<T>& operator=(const mtable<T>&) = delete;
+	class row_proxy;
+	row_proxy operator[](int r);
+
+	class row_proxy
+	{
+	public:
+		row_proxy(T*& _p_table, int& _cl) : p_table(_p_table), col(_cl){};
+		~row_proxy() {};
+		int& operator[](int c);
+
+		int& col;
+		T*& p_table;
+	};
+
 	//row_proxy operator[](int r);
-
-	//class row_proxy
-	//{
-	//public:
-	//	row_proxy() {};
-	//	~row_proxy() {};
-	//	T& operator[](int c);
-
-	//	int& row = mtable<T>::row;
-	//	int& column = mtable<T>::column;
-	//	T**& t_table = mtable<T>::t_table;
-	//};
-
-	T* operator[](int r);
-	const T* operator[](int r) const;
+	//const row_proxy operator[](int r) const;
 	int size();
 
 private:
@@ -52,34 +51,19 @@ T** mtable<T>::create_table()
 	return tmp;
 }
 
-//template<typename T>
-//mtable<T>::row_proxy mtable<T>::operator[](int r)
-//{
-//	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
-//	return mtable<T>::row_proxy;
-//}
-//
-//template<typename T>
-//T& mtable<T>::row_proxy::operator[](int c)
-//{
-//	if (c < 0 || c >= this->column) throw std::exception("Column index out of array!");
-//	return this->column;
-//}
-
 template<typename T>
-T* mtable<T>::operator[](int r)
+typename mtable<T>::row_proxy mtable<T>::operator[](int r)
 {
 	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
-	return this->t_table[r];
+	return mtable<T>::row_proxy(this->t_table[r], this->column);
 }
 
 template<typename T>
-const T* mtable<T>::operator[](int r) const
+int& mtable<T>::row_proxy::operator[](int c)
 {
-	if (r < 0 || r >= this->row) throw std::exception("Row index out of array!");
-	return this->t_table[r];
+	if (c < 0 || c >= this->col) throw std::exception("Column index out of array!");
+	return this->col;
 }
-
 
 template<typename T>
 int mtable<T>::size()
@@ -108,8 +92,9 @@ int main()
 {
 	try
 	{
-		auto test = mtable<int>(2, 3);
+		mtable<int> test{ 2, 3 };
 		test[0][0] = 4;
+
 		std::cout << test[0][0] << std::endl;
 	}
 	catch (const std::exception& ex)
